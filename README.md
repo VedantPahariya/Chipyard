@@ -8,6 +8,7 @@
 - **DOCUMENTATION_MAP.txt** : Visual documentation map with quick reference for all tasks and file locations
 - **README_ARA_GEMMINI_COMPLETE.md** : Complete summary of Ara+Gemmini+Rocket integration with performance metrics and test results
 - **ROCKET_ARA_GEMMINI_SOC_GUIDE.md** : Comprehensive architecture guide covering system components, configuration, and performance tuning
+- **WRITING_CUSTOM_TESTCASES.md** : Complete guide to writing custom bare-metal testcases for Ara+Gemmini with examples, troubleshooting, and best practices
 
 ### Setup Guides/
 - **Chipyard Feasibility.md** : Feasibility analysis and evaluation of Chipyard for heterogeneous SoC development
@@ -278,5 +279,53 @@ make CONFIG=YourCustomConfig USE_ARA=1 -j$(nproc)
 **Remember:** Earlier (leftmost) fragments override later (rightmost) ones, so order matters!
 
 ---
+
+### Testing the Configuration wth Custom Testcases
+
+Refer the [WRITING_CUSTOM_TESTCASES.md](Learn%20from%20Basics/WRITING_CUSTOM_TESTCASES.md) for detailed instructions on creating/running custom tests benchmarks for custom configuration.
+
+In short, after building your configuration, we have to build the testcases and then run them on the generated SoC. 
+
+#### Predefined Testcases
+There are predefined testcases under `generators/gemmini/software/gemmini-rocc-tests/` that you can use or modify. Following are the steps to run them:
+
+1. **Build the Testcases:**
+    ```bash
+    cd ./chipyard/generators/gemmini/software/gemmini-rocc-tests
+    ./build.sh  
+    ```
+2. **Run the Testcases:**
+    ```bash
+    cd ../../sims/verilator
+    time make CONFIG=YourCustomConfig USE_ARA=1 run-binary \
+    BINARY=../../generators/gemmini/software/gemmini-rocc-tests/build/bareMetalC/your_testcase-baremetal
+    ```
+
+Example:
+```bash
+time make CONFIG=Ara8192GemminiRocketConfig USE_ARA=1 run-binary \
+BINARY=../../generators/gemmini/software/gemmini-rocc-tests/build/bareMetalC/ara_gemmini_scalar_compare-baremetal
+```
+*time is just for measuring the duration for running make command.*
+
+#### Custom Testcases
+
+Custom Testcases are defined inside the `chipyard/software/` directory. These can be compiled and run following these steps:
+
+1. **Build the Testcases:**
+    ```bash
+    source ../../env.sh
+    make
+    ```
+
+2. **Run the Testcases:**
+    ```bash
+    cd ../../sims/verilator
+    time make CONFIG=YourCustomConfig USE_ARA=1 run-binary \
+    BINARY=../../software/your_custom_testcase-baremetal
+    ```
+
+### ./build.sh Vs make
+
 
 ### Modifying the Architecture
